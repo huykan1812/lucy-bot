@@ -4,6 +4,22 @@ from openai import OpenAI
 from telegram import Update, File
 from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filters
 
+from flask import Flask
+import threading
+
+# Flask app để tạo endpoint ping giữ bot luôn hoạt động
+flask_app = Flask('')
+
+@flask_app.route('/')
+def home():
+    return "Lucy bot is running."
+
+def run():
+    flask_app.run(host='0.0.0.0', port=8080)
+
+threading.Thread(target=run).start()
+
+# Bot cấu hình
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
@@ -67,5 +83,5 @@ if __name__ == '__main__':
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
     app.add_handler(MessageHandler(filters.Document.ALL, handle_document))
     app.add_handler(MessageHandler(~filters.TEXT & ~filters.Document.ALL, handle_text))
-    print("🤖 Lucy bot đang chạy trên Render!")
+    print("🤖 Lucy bot đang chạy trên Render với AutoPing!")
     app.run_polling()
